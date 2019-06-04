@@ -64,12 +64,12 @@ class BanditMDP(MDP):
 
         return distr_params
 
-    def _reward_func(self, state, action, next_state=None):
+    def _reward_func(self, state, action):
         '''
         Args:
             state (State)
             action (str)
-            next_state (State)
+            statePrime
 
         Returns
             (float)

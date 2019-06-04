@@ -42,12 +42,12 @@ class ComboLockMDP(MDP):
    
         return param_dict
 
-    def _reward_func(self, state, action, next_state=None):
+    def _reward_func(self, state, action):
         '''
         Args:
             state (State)
             action (str)
-            next_state (State)
+            statePrime
 
         Returns
             (float)

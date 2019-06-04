@@ -37,12 +37,11 @@ class GridGameMDP(MarkovGameMDP):
         param_dict["init_b_y"] = self.init_b_y
    
         return param_dict
-    def _reward_func(self, state, action_dict, next_state=None):
+    def _reward_func(self, state, action_dict):
         '''
         Args:
             state (State)
             action (dict of actions)
-            next_state (State)
 
         Returns
             (float)

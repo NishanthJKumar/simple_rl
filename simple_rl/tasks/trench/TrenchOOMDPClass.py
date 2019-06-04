@@ -56,12 +56,11 @@ class TrenchOOMDP(OOMDP):
 
         return TrenchOOMDPState(objects)
 
-    def _trench_reward_func(self, state, action, next_state=None):
+    def _trench_reward_func(self, state, action):
         '''
         Args:
             state (State)
             action (str)
-            next_state (State)
 
         Returns
             (float)
@@ -69,7 +68,7 @@ class TrenchOOMDP(OOMDP):
 
         if self._is_goal_state_action(state, action):
             return 10.0
-        elif (int(next_state.x), int(next_state.y)) in self.lava_locs:
+        elif self._is_lava_state_action(state, action):
             return -1.0
         else:
             return 0

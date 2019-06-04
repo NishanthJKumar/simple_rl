@@ -12,7 +12,18 @@ from simple_rl.run_experiments import run_agents_on_mdp, run_single_agent_on_mdp
 def main(open_plot=True):
     # Taxi initial state attributes..
     agent = {"x":1, "y":1, "has_passenger":0}
-    passengers = [{"x":3, "y":2, "dest_x":2, "dest_y":3, "in_taxi":0}]
+    passengers = [{"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":1},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0},
+                  {"x":2, "y":3, "dest_x":3, "dest_y":2, "in_taxi":0}]
     walls = []
     mdp = TaxiOOMDP(width=4, height=4, agent=agent, walls=walls, passengers=passengers)
 

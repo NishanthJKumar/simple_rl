@@ -4,6 +4,7 @@
 from __future__ import print_function
 import random
 import sys, os
+import copy
 import numpy as np
 from collections import defaultdict
 
@@ -28,14 +29,14 @@ class GridWorldMDP(MDP):
                 height=3,
                 init_loc=(1, 1),
                 rand_init=False,
-                goal_locs=[(5, 3)],
+                goal_locs=[()],
                 lava_locs=[()],
                 walls=[],
                 is_goal_terminal=True,
                 gamma=0.99,
                 slip_prob=0.0,
                 step_cost=0.0,
-                lava_cost=1.0,
+                lava_cost=0.01,
                 name="gridworld"):
         '''
         Args:
@@ -91,7 +92,7 @@ class GridWorldMDP(MDP):
         param_dict["slip_prob"] = self.slip_prob
         param_dict["step_cost"] = self.step_cost
         param_dict["lava_cost"] = self.lava_cost
-   
+
         return param_dict
 
     def set_slip_prob(self, slip_prob):
@@ -103,20 +104,18 @@ class GridWorldMDP(MDP):
     def is_goal_state(self, state):
         return (state.x, state.y) in self.goal_locs
 
-    def _reward_func(self, state, action, next_state):
+    def _reward_func(self, state, action):
         '''
         Args:
             state (State)
             action (str)
-            next_state (State)
 
         Returns
             (float)
         '''
-        if (int(next_state.x), int(next_state.y)) in self.goal_locs:
-            # self._is_goal_state_action(state, action):
+        if self._is_goal_state_action(state, action):
             return 1.0 - self.step_cost
-        elif (int(next_state.x), int(next_state.y)) in self.lava_locs:
+        elif self._is_lava_state_action(state, action):
             return -self.lava_cost
         else:
             return 0 - self.step_cost
@@ -133,6 +132,8 @@ class GridWorldMDP(MDP):
         if (state.x, state.y) in self.goal_locs and self.is_goal_terminal:
             # Already at terminal.
             return False
+        if (state.x, state.y) in self.lava_locs:
+            return False
 
         if action == "left" and (state.x - 1, state.y) in self.goal_locs:
             return True
@@ -141,6 +142,29 @@ class GridWorldMDP(MDP):
         elif action == "down" and (state.x, state.y - 1) in self.goal_locs:
             return True
         elif action == "up" and (state.x, state.y + 1) in self.goal_locs:
+            return True
+        else:
+            return False
+
+    def _is_lava_state_action(self, state, action):
+        '''
+        Args:
+            state (State)
+            action (str)
+
+        Returns:
+            (bool): True iff the state-action pair send the agent to the goal state.
+        '''
+        if state.is_terminal():
+            return False
+
+        if action == "left" and (state.x - 1, state.y) in self.lava_locs:
+            return True
+        elif action == "right" and (state.x + 1, state.y) in self.lava_locs:
+            return True
+        elif action == "down" and (state.x, state.y - 1) in self.lava_locs:
+            return True
+        elif action == "up" and (state.x, state.y + 1) in self.lava_locs:
             return True
         else:
             return False
@@ -156,8 +180,9 @@ class GridWorldMDP(MDP):
         '''
         if state.is_terminal():
             return state
-        
-        if not(self._is_goal_state_action(state, action)) and self.slip_prob > random.random():
+
+        r = random.random()
+        if self.slip_prob > r:
             # Flip dir.
             if action == "up":
                 action = random.choice(["left", "right"])
@@ -180,6 +205,9 @@ class GridWorldMDP(MDP):
             next_state = GridWorldState(state.x, state.y)
 
         if (next_state.x, next_state.y) in self.goal_locs and self.is_goal_terminal:
+            next_state.set_terminal(True)
+
+        if (next_state.x, next_state.y) in self.lava_locs:
             next_state.set_terminal(True)
 
         return next_state
@@ -220,26 +248,31 @@ class GridWorldMDP(MDP):
         }
 
         mdpv.visualize_policy(self, policy, _draw_state, action_char_dict)
+        input("Press anything to quit")
 
     def visualize_agent(self, agent):
         from simple_rl.utils import mdp_visualizer as mdpv
         from simple_rl.tasks.grid_world.grid_visualizer import _draw_state
         mdpv.visualize_agent(self, agent, _draw_state)
+        input("Press anything to quit")
 
     def visualize_value(self):
         from simple_rl.utils import mdp_visualizer as mdpv
         from simple_rl.tasks.grid_world.grid_visualizer import _draw_state
         mdpv.visualize_value(self, _draw_state)
+        input("Press anything to quit")
 
-    def visualize_learning(self, agent, delay=0.0):
+    def visualize_learning(self, agent, delay=0.005, num_ep=None, num_steps=None):
         from simple_rl.utils import mdp_visualizer as mdpv
         from simple_rl.tasks.grid_world.grid_visualizer import _draw_state
-        mdpv.visualize_learning(self, agent, _draw_state, delay=delay)
+        mdpv.visualize_learning(self, agent, _draw_state, delay=delay, num_ep=num_ep, num_steps=num_steps)
+        input("Press anything to quit")
 
     def visualize_interaction(self):
         from simple_rl.utils import mdp_visualizer as mdpv
         from simple_rl.tasks.grid_world.grid_visualizer import _draw_state
         mdpv.visualize_interaction(self, _draw_state)
+        input("Press anything to quit")
 
 def _error_check(state, action):
     '''
@@ -324,15 +357,14 @@ def make_grid_world_from_file(file_name, randomize=False, num_goals=1, name=None
 
     def reset(self):
         if self.rand_init:
-            init_loc = random.randint(1, width), random.randint(1, height)
+            init_loc = random.randint(1, num_cols), random.randint(1, num_rows)
             self.cur_state = GridWorldState(init_loc[0], init_loc[1])
         else:
             self.cur_state = copy.deepcopy(self.init_state)
 
 def main():
     grid_world = GridWorldMDP(5, 10, (1, 1), (6, 7))
-
-    grid_world.visualize()
+    grid_world.visualize_policy()
 
 if __name__ == "__main__":
     main()

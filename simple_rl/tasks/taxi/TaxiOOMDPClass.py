@@ -51,7 +51,7 @@ class TaxiOOMDP(OOMDP):
         Returns:
             (OOMDP State)
 
-        TODO: Make this more egneral and put it in OOMDPClass.
+        TODO: Make this more general and put it in OOMDPClass.
         '''
 
         objects = {c : [] for c in TaxiOOMDP.CLASSES}
@@ -68,12 +68,11 @@ class TaxiOOMDP(OOMDP):
 
         return TaxiState(objects)
 
-    def _taxi_reward_func(self, state, action, next_state=None):
+    def _taxi_reward_func(self, state, action):
         '''
         Args:
             state (OOMDP State)
             action (str)
-            next_state (OOMDP State)
 
         Returns
             (float)
@@ -144,14 +143,14 @@ class TaxiOOMDP(OOMDP):
 
     def visualize_agent(self, agent):
         from ...utils.mdp_visualizer import visualize_agent
-        from taxi_visualizer import _draw_state
+        from simple_rl.tasks.taxi.taxi_visualizer import _draw_state
         visualize_agent(self, agent, _draw_state)
         _ = input("Press anything to quit ")
         sys.exit(1)
 
     def visualize_interaction(self):
         from simple_rl.utils.mdp_visualizer import visualize_interaction
-        from taxi_visualizer import _draw_state
+        from simple_rl.tasks.taxi.taxi_visualizer import _draw_state
         visualize_interaction(self, _draw_state)
         raw_input("Press anything to quit ")
         sys.exit(1)
